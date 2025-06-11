@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Réunion</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'><circle cx='12' cy='13' r='9'/><polyline points='12,6 12,13 16,13'/><path d='M16.24,7.76 L19.07,4.93'/><path d='M4.93,4.93 L7.76,7.76'/><path d='M12,1 L12,3'/><path d='M21,12 L19,12'/><path d='M3,12 L1,12'/></svg>" type="image/svg+xml">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Timer Réunion">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .settings {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"], input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .participants-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .participants-table th {
+            background: #f0f0f0;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+            font-weight: bold;
+        }
+
+        .participants-table td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        .participants-table tbody tr:nth-child(even) {
+            background-color: #f0f0f0;
+        }
+
+        .participants-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .total-row {
+            background: #e8f5e8 !important;
+            font-weight: bold;
+        }
+
+        .total-row td {
+            background: #e8f5e8 !important;
+            border-top: 2px solid #4CAF50;
+        }
+
+        .name-cell {
+            width: 180px;
+            max-width: 180px;
+        }
+
+        .name-input {
+            width: 100%;
+            max-width: 160px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        .name-input:focus {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .timer-display {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        .time-over {
+            color: red;
+        }
+
+        .time-ok {
+            color: black;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .timer-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            min-width: 45px;
+        }
+
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .stop-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .reset-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #ff9800;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .total-time {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .meeting-controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .meeting-timer {
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+
+        .meeting-btn {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Timer Réunion - Gestion Temps de Parole</h1>
+        </div>
+
+        <div class="settings">
+            <div class="setting-group">
+                <label for="maxTime">Temps max par personne:</label>
+                <input type="number" id="maxTime" value="5" min="1" max="60">
+                <span>minutes</span>
+            </div>
+            <div class="setting-group">
+                <label for="newName">Ajouter participant:</label>
+                <input type="text" id="newName" placeholder="Nom du participant">
+                <button class="add-btn" onclick="addParticipant()">Ajouter</button>
+            </div>
+        </div>
+
+        <table class="participants-table">
+            <thead>
+                <tr>
+                    <th style="width: 180px;">Participant</th>
+                    <th style="width: 100px;">Timer</th>
+                    <th style="width: 140px;">Temps effectif</th>
+                    <th style="width: 200px;">Contrôles</th>
+                    <th style="width: 80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="participantsBody">
+                <!-- Les participants seront ajoutés ici -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="timer-display" id="totalTimer">00:00</td>
+                    <td class="timer-display" id="totalEffectiveTime">00:00</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="meeting-controls">
+            <h3>Timer Général de la Réunion</h3>
+            <div class="meeting-timer" id="totalTime">00:00:00</div>
+            <button id="startMeetingBtn" class="meeting-btn start-btn" onclick="startMeeting()">Démarrer Réunion</button>
+            <button id="stopMeetingBtn" class="meeting-btn stop-btn" onclick="stopMeeting()" disabled>Arrêter Réunion</button>
+            <button id="resetMeetingBtn" class="meeting-btn reset-btn" onclick="resetMeeting()">Reset Réunion</button>
+        </div>
+
+        <div class="total-time" style="display: none;">
+            <div>Temps total de réunion: <span id="totalTimeOld">00:00:00</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Enregistrer le service worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                .then(function(registration) {
+                    console.log('Service Worker registered successfully:', registration.scope);
+                }, function(err) {
+                    console.log('Service Worker registration failed: ', err);
+                });
+            });
+        }
+
+        let participants = [];
+        let totalStartTime = 0;
+        let totalElapsedTime = 0;
+        let totalInterval = null;
+        let meetingIsRunning = false;
+
+        // Charger les participants sauvegardés
+        loadParticipants();
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function formatTimeShort(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function saveParticipants() {
+            const participantsData = participants.map(p => ({
+                name: p.name,
+                id: p.id
+            }));
+            localStorage.setItem('meeting-participants', JSON.stringify(participantsData));
+        }
+
+        function loadParticipants() {
+            const saved = localStorage.getItem('meeting-participants');
+            if (saved) {
+                try {
+                    const participantsData = JSON.parse(saved);
+                    participantsData.forEach(data => {
+                        const participant = {
+                            id: data.id,
+                            name: data.name,
+                            startTime: 0,
+                            elapsedTime: 0,
+                            isRunning: false,
+                            interval: null
+                        };
+                        participants.push(participant);
+                    });
+                    renderParticipants();
+                } catch (e) {
+                    console.error('Erreur lors du chargement des participants:', e);
+                }
+            }
+        }
+
+        function updateTotalTime() {
+            if (meetingIsRunning) {
+                const currentElapsed = Date.now() - totalStartTime;
+                const totalTime = totalElapsedTime + currentElapsed;
+                document.getElementById('totalTime').textContent = formatTime(totalTime);
+            }
+        }
+
+        function updateTotalRow() {
+            let totalCurrentTime = 0;
+            let totalEffectiveTime = 0;
+
+            participants.forEach(p => {
+                if (p.isRunning) {
+                    totalCurrentTime += Date.now() - p.startTime;
+                } else {
+                    totalCurrentTime += p.elapsedTime;
+                }
+                totalEffectiveTime += p.elapsedTime;
+            });
+
+            document.getElementById('totalTimer').textContent = formatTimeShort(totalCurrentTime);
+            document.getElementById('totalEffectiveTime').textContent = formatTimeShort(totalEffectiveTime);
+        }
+
+        function startMeeting() {
+            if (!meetingIsRunning) {
+                totalStartTime = Date.now();
+                meetingIsRunning = true;
+                totalInterval = setInterval(updateTotalTime, 1000);
+                document.getElementById('startMeetingBtn').disabled = true;
+                document.getElementById('stopMeetingBtn').disabled = false;
+            }
+        }
+
+        function stopMeeting() {
+            if (meetingIsRunning) {
+                totalElapsedTime += Date.now() - totalStartTime;
+                meetingIsRunning = false;
+                clearInterval(totalInterval);
+
+                // Arrêter tous les timers participants
+                participants.forEach(p => {
+                    if (p.isRunning) {
+                        stopTimer(p.id);
+                    }
+                });
+
+                document.getElementById('startMeetingBtn').disabled = false;
+                document.getElementById('stopMeetingBtn').disabled = true;
+            }
+        }
+
+        function resetMeeting() {
+            meetingIsRunning = false;
+            totalElapsedTime = 0;
+            clearInterval(totalInterval);
+            document.getElementById('totalTime').textContent = '00:00:00';
+            document.getElementById('startMeetingBtn').disabled = false;
+            document.getElementById('stopMeetingBtn').disabled = true;
+
+            // Reset tous les timers participants
+            participants.forEach(p => {
+                resetTimer(p.id);
+            });
+        }
+
+        function addParticipant() {
+            const nameInput = document.getElementById('newName');
+            const name = nameInput.value.trim();
+
+            if (name === '') {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+
+            const participant = {
+                id: Date.now(),
+                name: name,
+                startTime: 0,
+                elapsedTime: 0,
+                isRunning: false,
+                interval: null
+            };
+
+            participants.push(participant);
+            nameInput.value = '';
+            saveParticipants();
+            renderParticipants();
+        }
+
+        function removeParticipant(id) {
+            const index = participants.findIndex(p => p.id === id);
+            if (index !== -1) {
+                if (participants[index].interval) {
+                    clearInterval(participants[index].interval);
+                }
+                participants.splice(index, 1);
+                saveParticipants();
+                renderParticipants();
+            }
+        }
+
+        function startTimer(id) {
+            // Démarrer automatiquement la réunion si ce n'est pas déjà fait
+            if (!meetingIsRunning) {
+                startMeeting();
+            }
+
+            // Arrêter tous les autres timers
+            participants.forEach(p => {
+                if (p.isRunning && p.id !== id) {
+                    stopTimer(p.id);
+                }
+            });
+
+            const participant = participants.find(p => p.id === id);
+            if (participant && !participant.isRunning) {
+                participant.startTime = Date.now() - participant.elapsedTime;
+                participant.isRunning = true;
+                participant.interval = setInterval(() => {
+                    updateParticipantDisplay(id);
+                    updateTotalRow();
+                }, 1000);
+                renderParticipants();
+            }
+        }
+
+        function stopTimer(id) {
+            const participant = participants.find(p => p.id === id);
+            if (participant && participant.isRunning) {
+                clearInterval(participant.interval);
+                participant.elapsedTime = Date.now() - participant.startTime;
+                participant.isRunning = false;
+                updateTotalRow();
+                renderParticipants();
+            }
+        }
+
+        function resetTimer(id) {
+            const participant = participants.find(p => p.id === id);
+            if (participant) {
+                clearInterval(participant.interval);
+                participant.elapsedTime = 0;
+                participant.isRunning = false;
+                updateTotalRow();
+                renderParticipants();
+            }
+        }
+
+        function updateParticipantDisplay(id) {
+            const participant = participants.find(p => p.id === id);
+            if (participant && participant.isRunning) {
+                participant.elapsedTime = Date.now() - participant.startTime;
+                const timerCell = document.getElementById(`timer-${id}`);
+                const timeCell = document.getElementById(`time-${id}`);
+
+                if (timerCell) {
+                    timerCell.textContent = formatTimeShort(participant.elapsedTime);
+                }
+
+                if (timeCell) {
+                    updateTimeDisplay(participant, timeCell);
+                }
+            }
+        }
+
+        function updateTimeDisplay(participant, cell) {
+            const maxTimeMs = parseInt(document.getElementById('maxTime').value) * 60 * 1000;
+            const elapsed = participant.elapsedTime;
+            const timeStr = formatTimeShort(elapsed);
+
+            if (elapsed > maxTimeMs) {
+                const overtime = elapsed - maxTimeMs;
+                const overtimeStr = formatTimeShort(overtime);
+                cell.innerHTML = `<span class="time-over">${timeStr} <span style="color: black;">(+${overtimeStr})</span></span>`;
+            } else {
+                cell.innerHTML = `<span class="time-ok">${timeStr}</span>`;
+            }
+        }
+
+        function updateParticipantName(id, newName) {
+            const participant = participants.find(p => p.id === id);
+            if (participant) {
+                participant.name = newName;
+                saveParticipants();
+            }
+        }
+
+        function renderParticipants() {
+            const tbody = document.getElementById('participantsBody');
+            tbody.innerHTML = '';
+
+            participants.forEach(participant => {
+                const row = document.createElement('tr');
+
+                // Nom
+                const nameCell = document.createElement('td');
+                nameCell.className = 'name-cell';
+                nameCell.innerHTML = `<input type="text" class="name-input" value="${participant.name}" onchange="updateParticipantName(${participant.id}, this.value)">`;
+
+                // Timer en cours
+                const timerCell = document.createElement('td');
+                timerCell.className = 'timer-display';
+                timerCell.id = `timer-${participant.id}`;
+                timerCell.textContent = formatTimeShort(participant.elapsedTime);
+
+                // Temps effectif
+                const timeCell = document.createElement('td');
+                timeCell.className = 'timer-display';
+                timeCell.id = `time-${participant.id}`;
+                updateTimeDisplay(participant, timeCell);
+
+                // Contrôles
+                const controlsCell = document.createElement('td');
+                controlsCell.innerHTML = `
+                    <div class="timer-controls">
+                        <button class="timer-btn start-btn" onclick="startTimer(${participant.id})" ${participant.isRunning ? 'disabled' : ''}>Start</button>
+                        <button class="timer-btn stop-btn" onclick="stopTimer(${participant.id})" ${!participant.isRunning ? 'disabled' : ''}>Stop</button>
+                        <button class="timer-btn reset-btn" onclick="resetTimer(${participant.id})">Reset</button>
+                    </div>
+                `;
+
+                // Supprimer
+                const deleteCell = document.createElement('td');
+                deleteCell.innerHTML = `<button class="delete-btn" onclick="removeParticipant(${participant.id})">Suppr</button>`;
+
+                row.appendChild(nameCell);
+                row.appendChild(timerCell);
+                row.appendChild(timeCell);
+                row.appendChild(controlsCell);
+                row.appendChild(deleteCell);
+
+                tbody.appendChild(row);
+            });
+
+            // Mettre à jour la ligne de total
+            updateTotalRow();
+        }
+
+        // Ajouter participant avec Entrée
+        document.getElementById('newName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addParticipant();
+            }
+        });
+
+        // Initialiser la ligne de total
+        updateTotalRow();
+    </script>
+</body>
+</html>
