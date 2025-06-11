@@ -1,0 +1,35 @@
+{
+  "name": "Timer Réunion - Gestion Temps de Parole",
+  "short_name": "Timer Réunion",
+  "description": "Application de gestion du temps de parole en réunion",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192' fill='%234CAF50'><circle cx='96' cy='104' r='72'/><polyline points='96,48 96,104 128,104' stroke='white' stroke-width='6' fill='none'/><path d='M129.92,62.08 L152.56,39.44' stroke='%234CAF50' stroke-width='4'/><path d='M39.44,39.44 L62.08,62.08' stroke='%234CAF50' stroke-width='4'/><path d='M96,8 L96,24' stroke='%234CAF50' stroke-width='4'/><path d='M168,96 L152,96' stroke='%234CAF50' stroke-width='4'/><path d='M24,96 L8,96' stroke='%234CAF50' stroke-width='4'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%234CAF50'><circle cx='256' cy='276' r='192'/><polyline points='256,128 256,276 341,276' stroke='white' stroke-width='16' fill='none'/><path d='M346.45,165.55 L406.15,105.85' stroke='%234CAF50' stroke-width='12'/><path d='M105.85,105.85 L165.55,165.55' stroke='%234CAF50' stroke-width='12'/><path d='M256,21 L256,64' stroke='%234CAF50' stroke-width='12'/><path d='M448,256 L405,256' stroke='%234CAF50' stroke-width='12'/><path d='M64,256 L21,256' stroke='%234CAF50' stroke-width='12'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720' fill='%23f5f5f5'><rect width='1280' height='720' fill='%23f5f5f5'/><rect x='240' y='60' width='800' height='600' rx='10' fill='white' stroke='%23ddd'/><text x='640' y='120' text-anchor='middle' font-family='Arial' font-size='24' font-weight='bold' fill='%23333'>Timer Réunion - Gestion Temps de Parole</text><rect x='300' y='180' width='680' height='300' fill='%23f9f9f9' stroke='%23ddd'/><text x='320' y='210' font-family='Arial' font-size='14' font-weight='bold' fill='%23333'>Participant</text><text x='500' y='210' font-family='Arial' font-size='14' font-weight='bold' fill='%23333'>Timer</text><text x='640' y='210' font-family='Arial' font-size='14' font-weight='bold' fill='%23333'>Temps effectif</text></svg>",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ]
+}
